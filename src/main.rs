@@ -9,7 +9,7 @@ use rmcp::{
 
 #[derive(Clone)]
 pub struct Counter {
-    client: std::sync::Arc<aws_sdk_cloudwatchlogs::Client>,
+    client: aws_sdk_cloudwatchlogs::Client,
     tool_router: ToolRouter<Self>,
 }
 
@@ -34,12 +34,10 @@ pub struct AddParams {
 
 #[tool_router]
 impl Counter {
-    fn new() -> Self {
-        let sdk_config = aws_config::SdkConfig::builder()
-            .behavior_version(BehaviorVersion::latest())
-            .build();
+    async fn new() -> Self {
+        let sdk_config = aws_config::load_defaults(BehaviorVersion::latest()).await;
 
-        let client = std::sync::Arc::new(aws_sdk_cloudwatchlogs::Client::new(&sdk_config));
+        let client = aws_sdk_cloudwatchlogs::Client::new(&sdk_config);
 
         Self {
             client,
@@ -80,6 +78,7 @@ impl Counter {
             .send()
             .await
             .map_err(|e| {
+                println!("{:?}", e);
                 ErrorData::new(
                     ErrorCode(1),
                     format!("An error occurred when calling the API: {}", e),
@@ -141,7 +140,27 @@ impl rmcp::ServerHandler for Counter {
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
-    let service = Counter::new().serve(stdio()).await?;
+    let service = Counter::new().await.serve(stdio()).await?;
     service.waiting().await?;
     Ok(())
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[tokio::test]
+    async fn test() {
+        let c = Counter::new().await;
+
+        let _ = c
+            .query(Parameters(AddParams {
+                end_time: 1752364800,         // サンプルのエポック秒
+                start_time: Some(1752278400), // サンプルのエポック秒
+                limit: Some(10),              // サンプルのリミット
+                keyword: "error".to_string(), // サンプルのキーワード
+            }))
+            .await
+            .unwrap();
+    }
 }
