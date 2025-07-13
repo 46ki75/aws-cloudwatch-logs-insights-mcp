@@ -1,0 +1,9 @@
+{
+    "id": "cargo-binstall",
+    "name": "cargo-binstall",
+    "version": "1.0.0",
+    "customizations": {},
+    "installsAfter": [
+        "ghcr.io/devcontainers/features/rust"
+    ]
+}
