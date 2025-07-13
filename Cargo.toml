@@ -4,3 +4,10 @@ version = "0.1.0"
 edition = "2024"
 
 [dependencies]
+aws-config = "1.8.1"
+aws-sdk-cloudwatchlogs = "1.91.0"
+rmcp = { version = "0.2.1", features = ["transport-io"] }
+rmcp-macros = "0.2.1"
+schemars = "0"
+serde = "1.0.219"
+tokio = { version = "1.46.1", features = ["full"] }
