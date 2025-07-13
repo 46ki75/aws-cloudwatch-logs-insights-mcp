@@ -1,0 +1,7 @@
+{
+    "servers": {
+        "cloud.ikuma.aws-cloudwatch-logs-insights-mcp": {
+            "command": "/workspaces/aws-cloudwatch-logs-insights-mcp/target/release/aws-cloudwatch-logs-insights-mcp",
+        }
+    }
+}
